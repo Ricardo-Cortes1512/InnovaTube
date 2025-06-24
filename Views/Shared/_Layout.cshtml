@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - InnovaTube</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</head>
+<body>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3" style="background-color: red;">
+        <div class="container-fluid">
+            <a class="navbar-brand" asp-area="" asp-controller="Users" asp-action="Index" style="color: white;">InnovaTube</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @*<li style="margin-right: 15px;">
+                            @Html.ActionLink("Favoritos", "Favoritos", "Users", null, new { style = "color: white;" })
+                        </li>
+                        <li>
+                            @Html.ActionLink("Cerrar Sesion", "CerrarSesion", "Access", null, new { style = "color: white;" })
+                        </li>*@
+                    @*<li style="margin-right: 15px;">
+                        @Html.ActionLink("Inicio", "Index", "Home", null, new { @class = "nav-link" })
+                    </li>
+                    <li>
+                        @Html.ActionLink("Contacto", "Contacto", "Home", null, new { @class = "nav-link" })
+                    </li>*@
+                    </ul>
+                </div>
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item" style="margin-left:auto;">
+                        <a class="navbar-brand" asp-area="" asp-controller="Users" asp-action="Index" style="color: white;">
+                            @if (Session["NombreUsuario"] != null)
+                            {
+                                <p>Bienvenido, @Session["NombreUsuario"]</p>
+                            }
+                            else
+                            {
+                                <p>No has iniciado sesión</p>
+                            }
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    @*<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark bg-dark">
+            <div class="container">
+                @Html.ActionLink("Clientes", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" title="Alternar navegación" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </nav>*@
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - InnovaTube</p>
+        </footer>
+    </div>
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>

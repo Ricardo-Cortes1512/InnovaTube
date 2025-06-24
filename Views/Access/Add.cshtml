@@ -1,0 +1,49 @@
+﻿@model PruebaCrudMVC.Models.ViewModels.UsersViewModel
+@{
+    ViewBag.Title = "Agregar Usuario";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Add", "Users", FormMethod.Post, new { }))
+        {
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationMessage("error", new { @class = "text-danger" })
+
+            @Html.LabelFor(d => d.Nombre)
+            @Html.TextBoxFor(d => d.Nombre, new { @class = "form-control" })<br>
+
+            @Html.LabelFor(d => d.Apellido)
+            @Html.TextBoxFor(d => d.Apellido, new { @class = "form-control" })<br>
+
+            @Html.LabelFor(d => d.Usuario)
+            @Html.TextBoxFor(d => d.Usuario, new { @class = "form-control" })<br><br>
+
+            @Html.LabelFor(d => d.Correo)
+            @Html.TextBoxFor(d => d.Correo, new { @class = "form-control" })<br>
+
+            @Html.LabelFor(d => d.Contraseña)
+            @Html.TextBoxFor(d => d.Contraseña, new { @class = "form-control" })<br>
+
+            @Html.LabelFor(d => d.ConfirmarContraseña)
+            @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @readonly = true })<br>
+
+            //Codigo para el captcha
+            @*@Html.LabelFor(d => d.ConfirmarContraseña)
+                @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @readonly = true })<br>*@
+            <div class="g-recaptcha" data-sitekey="6LdqJ2wrAAAAABfmiwL4RfA012XDDiw81Ft0YNJ-"></div>
+
+            <div style="text-align:right;">
+                <input type="submit" class="btn btn-success" value="Guardar" />
+            </div>
+
+        }
+    </div>
+</div>
+
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+

@@ -1,0 +1,46 @@
+﻿
+@{
+    ViewBag.Title = "Acceso";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<br><br><br>
+<div class="row">
+    <form id="frm">
+        <div class="col-lg-6 col-lg-offset-3">
+            Usuario
+            <input type="text" name="user" />
+            <br><br>
+            Password
+            <input type="password" name="password" />
+            <br><br>
+            <input type="submit" class="btn btn-success" value="Entrar">
+            <input onclick="document.location.href='@Url.Content("~/Access/RecuperarContraseña/")'" type="button" value="Recuperar Contraseña" class="btn btn-primary" />
+            <input type="button" class="btn btn-success" onclick="document.location.href='@Url.Content("~/Access/Add")'" value="Nuevo Usuario" />
+            @*<input onclick="document.location.href='@Url.Content("~/Users/add/")'" type="button" value="Nuevo Usuario" class="btn btn-primary" />*@
+        </div>
+    </form>
+</div>
+@{ 
+    var a = 1;
+}
+
+<script>
+    $(document).ready(function () {
+        $("#frm").submit(function (e) {
+            e.preventDefault();
+
+            url = "@Url.Content("~/Access/Enter")"
+            parametros = $(this).serialize();
+
+            $.post(url, parametros, function (data) {
+
+                if (data == "1") {
+                    document.location.href = "@Url.Content("~/Users")";
+                } else {
+                    alert(data)
+                }
+            })
+        })
+    })
+</script>

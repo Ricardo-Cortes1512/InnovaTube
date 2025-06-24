@@ -1,0 +1,34 @@
+﻿@model PruebaCrudMVC.Models.ViewModels.EditUsersViewModel
+@{
+    ViewBag.Title = "Edit";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col-md-12">
+        @using (Html.BeginForm("Edit", "Users", FormMethod.Post, new { }))
+        {
+            @Html.HiddenFor(d => d.ID)
+            @Html.AntiForgeryToken()
+
+            @Html.ValidationMessage("error", new { @class = "text-danger" })
+
+            @Html.LabelFor(d => d.Contraseña)
+            @Html.TextBoxFor(d => d.Contraseña, new { @class = "form-control" })<br>
+            //@Html.LabelFor(d => d.Cliente)
+            //@Html.DropDownListFor(d => d.Cliente, (SelectList)ViewBag.idCliente, "-Seleccionar categoria-", new { @class = "form- control" })<br>
+
+
+            @Html.LabelFor(d => d.ConfirmarContraseña)
+            @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @class = "form-control" })<br>
+
+            <div style="text-align:right;">
+                <input type="submit" class="btn btn-success" value="Guardar" />
+            </div>
+
+        }
+    </div>
+</div>
+
+

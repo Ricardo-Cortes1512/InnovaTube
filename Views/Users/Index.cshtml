@@ -1,0 +1,88 @@
+﻿@model List<PruebaCrudMVC.Models.TableViewModels.CancionesTableViewModel>
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+
+<h2>Inicio</h2>
+@*<div class="row">
+        <div class="col-md-12">
+            <input type="button" class="btn btn-primary" onclick="document.location.href='@Url.Content("~/Clientes/Add")'" value="Nuevo" />
+        </div>
+    </div>*@
+<br>
+<br>
+<input type="text" id="buscar" placeholder="Buscar por canción o artista..." />
+<br>
+<br>
+<div class="row">
+    <div class="col-md-12">
+        <table id="tablaCanciones" class="table-bordered">
+            <tr>
+                <th class="col-md-4">Cancion</th>
+                <th class="col-md-4">Artista</th>
+                <th class="col-md-4">Genero</th>
+                <th class="col-md-4"></th>
+            </tr>
+            <tbody>
+                @foreach (var elemento in Model)
+                {
+                    <tr>
+                        <td>@elemento.Nombre</td>
+                        <td>@elemento.Artista</td>
+                        <td>@elemento.Genero</td>
+                        <td>
+                            <input onclick="jsDelete(@elemento.ID);" type="button" value="Favorito" class="btn btn-primary" />
+                        </td>
+                    </tr>
+                 }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function jsDelete(id)
+    {
+            url = "@Url.Content("~/Users/Favorito")" + "/"+ id;
+
+            $.post(url, function (data)
+            {
+                if (data == "1")
+                {
+                    document.location.href = "@Url.Content("~/Users/")"
+                } else {
+                    alert("Ocurrio un error")
+                        }
+            })
+    }
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+        $(document).ready(function () {
+            $("#buscar").on("keyup", function () {
+                var texto = $(this).val();
+
+                $.ajax({
+                    url: '@Url.Action("Buscar", "Users")',
+                    data: { termino: texto },
+                    type: "GET",
+                    success: function (data) {
+                        var tbody = $("#tablaCanciones tbody");
+                        tbody.empty();
+
+                        $.each(data, function (i, cancion) {
+                            var boton = "<button class='btn-fav' data-id='" + cancion.Id + "'>" + favorito + "</button>";
+                            var fila = "<tr><td>" + cancion.Nombre_Cancion + "</td><td>" + cancion.Artista + "</td></tr>" + cancion.Genero + "</td></tr>" + boton + "</td></tr>" ;
+                            tbody.append(fila);
+                        });
+
+                        if (data.length === 0) {
+                            tbody.append("<tr><td colspan='2'>No se encontraron resultados</td></tr>");
+                        }
+                    }
+                });
+            });
+        });
+</script>
+
