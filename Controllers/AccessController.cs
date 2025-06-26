@@ -53,11 +53,19 @@ namespace PruebaCrudMVC.Controllers
                 return View(model);
             }
 
-            using (var db = new PruebasCrudMVCEntities())
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
-                var oUser = db.Users.Find(model.ID);
-                oUser.Contraseña = model.Contraseña;
+                // Buscar por nombre de usuario (no por ID)
+                var oUser = db.Users.FirstOrDefault(u => u.Usuario == model.Usuario || u.Nombre == model.Usuario);
 
+                if (oUser == null)
+                {
+                    ModelState.AddModelError("", "Usuario no encontrado.");
+                    return View(model);
+                }
+
+                // Actualizar contraseña
+                oUser.Contraseña = model.Contraseña;
                 db.Entry(oUser).State = System.Data.Entity.EntityState.Modified;
                 db.SaveChanges();
             }
@@ -85,7 +93,7 @@ namespace PruebaCrudMVC.Controllers
                 return View(model);
             }
 
-            using (var db = new PruebasCrudMVCEntities())
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 //var clientes = db.tbl_Clientes.ToList();
                 //ViewBag.Clientes = new SelectList(clientes, "id", "Cliente");

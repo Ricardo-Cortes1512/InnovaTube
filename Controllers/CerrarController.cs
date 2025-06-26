@@ -10,7 +10,9 @@ namespace PruebaCrudMVC.Controllers
     {
         public ActionResult CerrarSesion()
         {
-            Session["User"] = null;
+            Session.Clear();        // Limpia todas las variables de sesión
+            Session.Abandon();      // Finaliza la sesión actual
+
             return RedirectToAction("Index", "Access");
         }
     }

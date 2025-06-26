@@ -18,16 +18,21 @@
 <div class="row">
     <div class="col-md-12">
         <table id="tablaCanciones" class="table-bordered">
-            <tr>
-                <th class="col-md-4">Cancion</th>
-                <th class="col-md-4">Artista</th>
-                <th class="col-md-4">Genero</th>
-                <th class="col-md-4"></th>
-            </tr>
+            <thead>
+                <tr>
+                    <th class="col-md-4">Cancion</th>
+                    <th class="col-md-4">Artista</th>
+                    <th class="col-md-4">Genero</th>
+                    <th class="col-md-4"></th>
+                </tr>
+            </thead>
             <tbody>
                 @foreach (var elemento in Model)
                 {
                     <tr>
+                        <td style="display:none;">
+                            <input type="hidden" class="id" value="@elemento.ID" />
+                        </td>
                         <td>@elemento.Nombre</td>
                         <td>@elemento.Artista</td>
                         <td>@elemento.Genero</td>
@@ -35,54 +40,74 @@
                             <input onclick="jsDelete(@elemento.ID);" type="button" value="Favorito" class="btn btn-primary" />
                         </td>
                     </tr>
-                 }
+                }
             </tbody>
         </table>
     </div>
 </div>
 
-<script>
-    function jsDelete(id)
-    {
-            url = "@Url.Content("~/Users/Favorito")" + "/"+ id;
+    <script>
+        function jsDelete(id)
+        {
+                url = "@Url.Content("~/Users/Favorito")" + "/"+ id;
 
-            $.post(url, function (data)
-            {
-                if (data == "1")
+                $.post(url, function (data)
                 {
-                    document.location.href = "@Url.Content("~/Users/")"
-                } else {
-                    alert("Ocurrio un error")
-                        }
-            })
-    }
-</script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
+                    if (data == "1")
+                    {
+                        document.location.href = "@Url.Content("~/Users/")"
+                    } else {
+                        alert("Ocurrio un error")
+                            }
+                })
+        }
+    </script>
+
+@section scripts{
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
         $(document).ready(function () {
             $("#buscar").on("keyup", function () {
                 var texto = $(this).val();
+                if (texto === "") {
+                    location.reload(); // recarga para volver a ver el Razor
+                    return;
+                }
+            $.ajax({
+                url: '@Url.Action("Buscar", "Users")',
+                data: { termino: texto },
+                type: "GET",
+                success: function (data) {
+                    // Obtener el <tbody> de la tabla
+                    console.log(data);
+                var tbody = $("#tablaCanciones tbody");
 
-                $.ajax({
-                    url: '@Url.Action("Buscar", "Users")',
-                    data: { termino: texto },
-                    type: "GET",
-                    success: function (data) {
-                        var tbody = $("#tablaCanciones tbody");
-                        tbody.empty();
+                // 2️⃣ Limpiar el contenido anterior (incluyendo lo generado por Razor)
+                tbody.empty();
 
-                        $.each(data, function (i, cancion) {
-                            var boton = "<button class='btn-fav' data-id='" + cancion.Id + "'>" + favorito + "</button>";
-                            var fila = "<tr><td>" + cancion.Nombre_Cancion + "</td><td>" + cancion.Artista + "</td></tr>" + cancion.Genero + "</td></tr>" + boton + "</td></tr>" ;
-                            tbody.append(fila);
-                        });
-
-                        if (data.length === 0) {
-                            tbody.append("<tr><td colspan='2'>No se encontraron resultados</td></tr>");
-                        }
-                    }
-                });
+                // 3️⃣ Si hay resultados, agregarlos
+                if (data.length > 0) {
+                    $.each(data, function (i, cancion) {
+                        var fila = "<tr>" +
+                            "<td>" + cancion.Nombre_Cancion + "</td>" +
+                            "<td>" + cancion.Artista + "</td>" +
+                            "<td>" + cancion.Genero + "</td>" +
+                            "<td><input onclick='jsDelete(" + cancion.ID + ")' type='button' value='Favorito' class='btn btn-primary' /></td>" +
+                            "</tr>";
+                        tbody.append(fila);
+                    });
+                } else {
+                    // 4️⃣ Si no hay resultados, mostrar mensaje
+                    tbody.append("<tr><td colspan='4'>No se encontraron resultados</td></tr>");
+                }
+            },
+            error: function () {
+                alert("Ocurrió un error al buscar canciones.");
+            }
             });
         });
-</script>
+    });
+    </script>
+}
 

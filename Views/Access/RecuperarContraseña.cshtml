@@ -14,6 +14,9 @@
 
             @Html.ValidationMessage("error", new { @class = "text-danger" })
 
+            @Html.LabelFor(d => d.Usuario)
+            @Html.TextBoxFor(d => d.Usuario, new { @class = "form-control" })<br>
+
             @Html.LabelFor(d => d.Contraseña)
             @Html.TextBoxFor(d => d.Contraseña, new { @class = "form-control" })<br>
             //@Html.LabelFor(d => d.Cliente)

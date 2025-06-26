@@ -24,6 +24,7 @@ namespace PruebaCrudMVC.Controllers
                 lst = (from d in db.Canciones
                       select new CancionesTableViewModel
                       {
+                          ID = d.ID,
                           Nombre = d.Nombre_Cancion,
                           Artista = d.Artista,
                           Genero = d.Genero,
@@ -39,13 +40,37 @@ namespace PruebaCrudMVC.Controllers
             using(PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 var canciones = db.Canciones
-                .Where(c => c.Nombre_Cancion.Contains(termino) || c.Artista.Contains(termino))
-                .Select(c => new {
-                    c.Nombre_Cancion,
-                    c.Artista,
-                    c.Genero,
-                    c.Favorito
+                    .Where(c => c.Nombre_Cancion.Contains(termino) || c.Artista.Contains(termino))
+                    .GroupBy(c => c.ID)
+                    .Select(g => g.FirstOrDefault())
+                    .Select(c => new {
+                        c.ID,
+                        c.Nombre_Cancion,
+                        c.Artista,
+                        c.Genero,
+                        c.Favorito
                 }).ToList();
+
+                return Json(canciones, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [HttpGet]
+        public JsonResult BuscarFav(string termino)
+        {
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
+            {
+                var canciones = db.Canciones
+                    .Where(c => c.Nombre_Cancion.Contains(termino) || c.Artista.Contains(termino) && c.Favorito == 1)
+                    .GroupBy(c => c.ID)
+                    .Select(g => g.FirstOrDefault())
+                    .Select(c => new {
+                        c.ID,
+                        c.Nombre_Cancion,
+                        c.Artista,
+                        c.Genero,
+                        c.Favorito
+                    }).ToList();
 
                 return Json(canciones, JsonRequestBehavior.AllowGet);
             }
@@ -72,7 +97,7 @@ namespace PruebaCrudMVC.Controllers
                 return View(model);
             }
 
-            using (var db = new PruebasCrudMVCEntities())
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 //var clientes = db.tbl_Clientes.ToList();
                 //ViewBag.Clientes = new SelectList(clientes, "id", "Cliente");
@@ -94,7 +119,7 @@ namespace PruebaCrudMVC.Controllers
         {
             EditUsersViewModel model = new EditUsersViewModel();
 
-            using(var db = new PruebasCrudMVCEntities())
+            using(PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 var oUser = db.Users.Find(id);
                 model.ID = oUser.ID;
@@ -112,7 +137,7 @@ namespace PruebaCrudMVC.Controllers
                 return View(model);
             }
 
-            using (var db = new PruebasCrudMVCEntities())
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 var oUser = db.Users.Find(model.ID);
                 oUser.Contraseña = model.Contraseña;
@@ -126,7 +151,7 @@ namespace PruebaCrudMVC.Controllers
         [HttpPost]
         public ActionResult Favorito(int ID)
         {
-            using (var db = new PruebasCrudMVCEntities())
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 var oCanciones = db.Canciones.Find(ID);
                 oCanciones.Favorito = 1; // se agrega a Favoritos
@@ -163,6 +188,7 @@ namespace PruebaCrudMVC.Controllers
                        where d.Favorito == 1
                        select new CancionesTableViewModel
                        {
+                           ID = d.ID,
                            Nombre = d.Nombre_Cancion,
                            Artista = d.Artista,
                            Genero = d.Genero,
@@ -174,7 +200,7 @@ namespace PruebaCrudMVC.Controllers
 
         public ActionResult NoFavorito(int ID)
         {
-            using (var db = new PruebasCrudMVCEntities())
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
                 var oCanciones = db.Canciones.Find(ID);
                 oCanciones.Favorito = 0; // se elimina de Favoritos

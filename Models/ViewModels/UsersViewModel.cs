@@ -50,6 +50,10 @@ namespace PruebaCrudMVC.Models.ViewModels
         public int ID { get; set; }
 
         [Required]
+        [Display(Name = "Usuario o Nombre")]
+        public string Usuario { get; set; }
+
+        [Required]
         [Display(Name = "Contraseña")]
         [DataType(DataType.Password)]
         public string Contraseña { get; set; }
