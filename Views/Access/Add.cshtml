@@ -8,7 +8,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        @using (Html.BeginForm("Add", "Users", FormMethod.Post, new { }))
+        @using (Html.BeginForm("Add", "Access", FormMethod.Post, new { }))
         {
             @Html.AntiForgeryToken()
 
@@ -27,14 +27,14 @@
             @Html.TextBoxFor(d => d.Correo, new { @class = "form-control" })<br>
 
             @Html.LabelFor(d => d.Contraseña)
-            @Html.TextBoxFor(d => d.Contraseña, new { @class = "form-control" })<br>
+            @Html.PasswordFor(d => d.Contraseña, new { @class = "form-control" })<br>
 
             @Html.LabelFor(d => d.ConfirmarContraseña)
-            @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @readonly = true })<br>
+            @Html.PasswordFor(d => d.ConfirmarContraseña, new { @class = "form-control" })<br>
 
             //Codigo para el captcha
             @*@Html.LabelFor(d => d.ConfirmarContraseña)
-                @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @readonly = true })<br>*@
+            @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @readonly = true })<br>*@
             <div class="g-recaptcha" data-sitekey="6LdqJ2wrAAAAABfmiwL4RfA012XDDiw81Ft0YNJ-"></div>
 
             <div style="text-align:right;">

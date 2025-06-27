@@ -18,13 +18,13 @@
             @Html.TextBoxFor(d => d.Usuario, new { @class = "form-control" })<br>
 
             @Html.LabelFor(d => d.Contraseña)
-            @Html.TextBoxFor(d => d.Contraseña, new { @class = "form-control" })<br>
+            @Html.PasswordFor(d => d.Contraseña, new { @class = "form-control" })<br>
             //@Html.LabelFor(d => d.Cliente)
             //@Html.DropDownListFor(d => d.Cliente, (SelectList)ViewBag.idCliente, "-Seleccionar categoria-", new { @class = "form- control" })<br>
 
 
             @Html.LabelFor(d => d.ConfirmarContraseña)
-            @Html.TextBoxFor(d => d.ConfirmarContraseña, new { @class = "form-control" })<br>
+            @Html.PasswordFor(d => d.ConfirmarContraseña, new { @class = "form-control" })<br>
 
             <div style="text-align:right;">
                 <input type="submit" class="btn btn-success" value="Guardar" />

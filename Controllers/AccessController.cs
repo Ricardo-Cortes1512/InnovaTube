@@ -8,6 +8,8 @@ using System.Web.Mvc;
 using Newtonsoft.Json;
 using PruebaCrudMVC.Models;
 using PruebaCrudMVC.Models.ViewModels;
+using PruebaCrudMVC.Helpers;
+using System.Net.NetworkInformation;
 
 namespace PruebaCrudMVC.Controllers
 {
@@ -21,12 +23,14 @@ namespace PruebaCrudMVC.Controllers
 
         public ActionResult Enter(string user, string password)
         {
+            string passEncriptada = Seguridad.EncriptarSHA256(password);
+
             try
             {
                 using (PruebasCrudMVCEntities db= new PruebasCrudMVCEntities())
                 {
                     var lst = from d in db.Users
-                              where d.Nombre == user || d.Usuario == user && d.Contraseña == password
+                              where d.Nombre == user || d.Usuario == user && d.Contraseña == passEncriptada || d.Contraseña == password
                               select d;
                     if (lst.Count()>0)
                     {
@@ -65,7 +69,7 @@ namespace PruebaCrudMVC.Controllers
                 }
 
                 // Actualizar contraseña
-                oUser.Contraseña = model.Contraseña;
+                oUser.Contraseña = Seguridad.EncriptarSHA256(model.Contraseña);
                 db.Entry(oUser).State = System.Data.Entity.EntityState.Modified;
                 db.SaveChanges();
             }
@@ -101,14 +105,15 @@ namespace PruebaCrudMVC.Controllers
                 oUser.Nombre = model.Nombre;
                 oUser.Apellido = model.Apellido;
                 oUser.Usuario = model.Usuario;
-                oUser.Contraseña = model.Contraseña;
+                oUser.Correo = model.Correo;
+                oUser.Contraseña = Seguridad.EncriptarSHA256(model.Contraseña);
 
                 db.Users.Add(oUser);
 
                 db.SaveChanges();
 
             }
-            return Redirect(Url.Content("~/Users/"));
+            return Redirect(Url.Content("~/Access/"));
         }
 
         public async Task<bool> ValidarCaptcha(string response)

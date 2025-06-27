@@ -25,7 +25,7 @@ namespace PruebaCrudMVC.Models.ViewModels
         public string Usuario { get; set; }
 
         [Required]
-        [Display(Name = "Contraseña")]
+        [Display(Name = "Correo")]
         [EmailAddress]
         public string Correo { get; set; }
 
