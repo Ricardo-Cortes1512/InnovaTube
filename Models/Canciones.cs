@@ -14,10 +14,19 @@ namespace PruebaCrudMVC.Models
     
     public partial class Canciones
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Canciones()
+        {
+            this.Calificacion = new HashSet<Calificacion>();
+        }
+    
         public int ID { get; set; }
         public string Nombre_Cancion { get; set; }
         public string Artista { get; set; }
         public string Genero { get; set; }
         public int Favorito { get; set; }
+    
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Calificacion> Calificacion { get; set; }
     }
 }

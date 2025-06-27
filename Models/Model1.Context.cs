@@ -25,6 +25,7 @@ namespace PruebaCrudMVC.Models
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Calificacion> Calificacion { get; set; }
         public virtual DbSet<Canciones> Canciones { get; set; }
         public virtual DbSet<Users> Users { get; set; }
     }

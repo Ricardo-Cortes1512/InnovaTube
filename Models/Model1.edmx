@@ -5,6 +5,15 @@
     <!-- SSDL content -->
     <edmx:StorageModels>
     <Schema Namespace="PruebasCrudMVCModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Calificacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="IdUsuario" Type="int" Nullable="false" />
+          <Property Name="IdCancion" Type="int" Nullable="false" />
+          <Property Name="Puntuacion" Type="int" Nullable="false" />
+        </EntityType>
         <EntityType Name="Canciones">
           <Key>
             <PropertyRef Name="ID" />
@@ -26,18 +35,71 @@
           <Property Name="Correo" Type="varchar" MaxLength="200" Nullable="false" />
           <Property Name="Contraseña" Type="varchar" MaxLength="100" Nullable="false" />
         </EntityType>
+        <Association Name="FK_Calificacion_Canciones">
+          <End Role="Canciones" Type="Self.Canciones" Multiplicity="1" />
+          <End Role="Calificacion" Type="Self.Calificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Canciones">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Calificacion">
+              <PropertyRef Name="IdCancion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Calificacion_Users">
+          <End Role="Users" Type="Self.Users" Multiplicity="1" />
+          <End Role="Calificacion" Type="Self.Calificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Calificacion">
+              <PropertyRef Name="IdUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="PruebasCrudMVCModelStoreContainer">
+          <EntitySet Name="Calificacion" EntityType="Self.Calificacion" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Canciones" EntityType="Self.Canciones" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_Calificacion_Canciones" Association="Self.FK_Calificacion_Canciones">
+            <End Role="Canciones" EntitySet="Canciones" />
+            <End Role="Calificacion" EntitySet="Calificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Calificacion_Users" Association="Self.FK_Calificacion_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Calificacion" EntitySet="Calificacion" />
+          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="PruebasCrudMVCModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
         <EntityContainer Name="PruebasCrudMVCEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Calificacion" EntityType="PruebasCrudMVCModel.Calificacion" />
           <EntitySet Name="Canciones" EntityType="PruebasCrudMVCModel.Canciones" />
           <EntitySet Name="Users" EntityType="PruebasCrudMVCModel.Users" />
+          <AssociationSet Name="FK_Calificacion_Canciones" Association="PruebasCrudMVCModel.FK_Calificacion_Canciones">
+            <End Role="Canciones" EntitySet="Canciones" />
+            <End Role="Calificacion" EntitySet="Calificacion" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Calificacion_Users" Association="PruebasCrudMVCModel.FK_Calificacion_Users">
+            <End Role="Users" EntitySet="Users" />
+            <End Role="Calificacion" EntitySet="Calificacion" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="Calificacion">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="IdUsuario" Type="Int32" Nullable="false" />
+          <Property Name="IdCancion" Type="Int32" Nullable="false" />
+          <Property Name="Puntuacion" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Canciones" Relationship="PruebasCrudMVCModel.FK_Calificacion_Canciones" FromRole="Calificacion" ToRole="Canciones" />
+          <NavigationProperty Name="Users" Relationship="PruebasCrudMVCModel.FK_Calificacion_Users" FromRole="Calificacion" ToRole="Users" />
+        </EntityType>
         <EntityType Name="Canciones">
           <Key>
             <PropertyRef Name="ID" />
@@ -47,6 +109,7 @@
           <Property Name="Artista" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Genero" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Favorito" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Calificacion" Relationship="PruebasCrudMVCModel.FK_Calificacion_Canciones" FromRole="Canciones" ToRole="Calificacion" />
         </EntityType>
         <EntityType Name="Users">
           <Key>
@@ -58,13 +121,48 @@
           <Property Name="Usuario" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="Correo" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="false" />
           <Property Name="Contraseña" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="Calificacion" Relationship="PruebasCrudMVCModel.FK_Calificacion_Users" FromRole="Users" ToRole="Calificacion" />
         </EntityType>
+        <Association Name="FK_Calificacion_Canciones">
+          <End Type="PruebasCrudMVCModel.Canciones" Role="Canciones" Multiplicity="1" />
+          <End Type="PruebasCrudMVCModel.Calificacion" Role="Calificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Canciones">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Calificacion">
+              <PropertyRef Name="IdCancion" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Calificacion_Users">
+          <End Type="PruebasCrudMVCModel.Users" Role="Users" Multiplicity="1" />
+          <End Type="PruebasCrudMVCModel.Calificacion" Role="Calificacion" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Users">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Calificacion">
+              <PropertyRef Name="IdUsuario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
         <EntityContainerMapping StorageEntityContainer="PruebasCrudMVCModelStoreContainer" CdmEntityContainer="PruebasCrudMVCEntities">
+          <EntitySetMapping Name="Calificacion">
+            <EntityTypeMapping TypeName="PruebasCrudMVCModel.Calificacion">
+              <MappingFragment StoreEntitySet="Calificacion">
+                <ScalarProperty Name="Puntuacion" ColumnName="Puntuacion" />
+                <ScalarProperty Name="IdCancion" ColumnName="IdCancion" />
+                <ScalarProperty Name="IdUsuario" ColumnName="IdUsuario" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Canciones">
             <EntityTypeMapping TypeName="PruebasCrudMVCModel.Canciones">
               <MappingFragment StoreEntitySet="Canciones">

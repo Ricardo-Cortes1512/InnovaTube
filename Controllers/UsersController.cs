@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,13 +15,13 @@ namespace PruebaCrudMVC.Controllers
 {
     public class UsersController : Controller
     {
-
-        // GET: Clientes
         public ActionResult Index()
         {
             List<CancionesTableViewModel> lst = null;
             using(PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
+                int usuarioID = ((Users)Session["User"]).ID;
+                var canciones = db.Canciones.ToList();
                 lst = (from d in db.Canciones
                       select new CancionesTableViewModel
                       {
@@ -28,9 +29,27 @@ namespace PruebaCrudMVC.Controllers
                           Nombre = d.Nombre_Cancion,
                           Artista = d.Artista,
                           Genero = d.Genero,
-                      }).ToList();
-            }
+                          CalificaionUsuario = db.Calificacion
+                                .Where(cal => cal.IdCancion == d.ID && cal.IdUsuario == usuarioID)
+                                .Select(cal => (int?)cal.Puntuacion)
+                                .FirstOrDefault(),
 
+                          PromedioCalificacion = db.Calificacion
+                                .Where(cal => cal.IdCancion == d.ID)
+                                .Select(cal => (double?)cal.Puntuacion)
+                                .Average() ?? 0,
+                          TotalCalificaciones = db.Calificacion.Count(cal => cal.IdCancion == d.ID)
+                      }).ToList();
+
+                // Obtener géneros únicos
+                var generos = db.Canciones
+                                .Select(c => c.Genero)
+                                .Distinct()
+                                .OrderBy(g => g)
+                                .ToList();
+
+                ViewBag.Generos = new SelectList(generos); // Pasar a la vista
+            }
             return View(lst);
         }
 
@@ -184,6 +203,8 @@ namespace PruebaCrudMVC.Controllers
             List<CancionesTableViewModel> lst = null;
             using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
             {
+                int usuarioID = ((Users)Session["User"]).ID;
+                var canciones = db.Canciones.ToList();
                 lst = (from d in db.Canciones
                        where d.Favorito == 1
                        select new CancionesTableViewModel
@@ -192,7 +213,24 @@ namespace PruebaCrudMVC.Controllers
                            Nombre = d.Nombre_Cancion,
                            Artista = d.Artista,
                            Genero = d.Genero,
+                           CalificaionUsuario = db.Calificacion
+                                .Where(cal => cal.IdCancion == d.ID && cal.IdUsuario == usuarioID)
+                                .Select(cal => (int?)cal.Puntuacion)
+                                .FirstOrDefault(),
+
+                           PromedioCalificacion = db.Calificacion
+                                .Where(cal => cal.IdCancion == d.ID)
+                                .Select(cal => (double?)cal.Puntuacion)
+                                .Average() ?? 0,
+                           TotalCalificaciones = db.Calificacion.Count(cal => cal.IdCancion == d.ID)
                        }).ToList();
+                var generos = db.Canciones
+                                .Select(c => c.Genero)
+                                .Distinct()
+                                .OrderBy(g => g)
+                                .ToList();
+
+                ViewBag.Generos = new SelectList(generos); // Pasar a la vista
             }
 
             return View(lst);
@@ -210,29 +248,40 @@ namespace PruebaCrudMVC.Controllers
             return Content("1");
         }
 
-        //public JsonResult ObtenerClientes()
-        //{
-        //    using (var db = new PruebasCrudMVCEntities())
-        //    {
-        //        var clientes = db.tbl_Clientes
-        //                       .Select(c => new { c.id, c.Cliente }).ToList();
-        //        return Json(clientes, JsonRequestBehavior.AllowGet);
-        //    }
+        [HttpPost]
+        public ActionResult Calificar(int cancionId, int puntuacion)
+        {
+            int usuarioId = ((Users)Session["User"]).ID; // Asegúrate de tener esto en sesión
 
-        //}
+            using (PruebasCrudMVCEntities db = new PruebasCrudMVCEntities())
+            {
+                var calificacion = db.Calificacion.FirstOrDefault(c => c.IdUsuario == usuarioId && c.IdCancion == cancionId);
 
-        //public ActionResult Crear()
-        //{
-        //    using (var db = new PruebasCrudMVCEntities())
-        //    {
-        //        var clientes = db.tbl_Clientes.ToList();
-        //        var model = new UsersViewModel
-        //        {
-        //            Clientes = new SelectList(clientes, "id", "Cliente")
-        //        };
-        //        return View(model);
-        //    }
+                if (calificacion == null)
+                {
+                    calificacion = new Calificacion
+                    {
+                        IdUsuario = usuarioId,
+                        IdCancion = cancionId,
+                        Puntuacion = puntuacion
+                    };
+                    db.Calificacion.Add(calificacion);
+                }
+                else
+                {
+                    calificacion.Puntuacion = puntuacion;
+                    db.Entry(calificacion).State = EntityState.Modified;
+                }
 
-        //}
+                db.SaveChanges();
+
+                // Obtener nuevo promedio
+                var nuevoPromedio = db.Calificacion
+                                      .Where(c => c.IdCancion == cancionId)
+                                      .Average(c => (double?)c.Puntuacion) ?? 0;
+
+                return Json(new { promedio = Math.Round(nuevoPromedio, 1) });
+            }
+        }
     }
 }

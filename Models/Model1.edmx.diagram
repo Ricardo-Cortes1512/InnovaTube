@@ -5,8 +5,11 @@
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
       <Diagram DiagramId="577a01d8127c42dcaacd326524fdddd7" Name="Diagram1">
-        <EntityTypeShape EntityType="PruebasCrudMVCModel.Canciones" Width="1.5" PointX="0.75" PointY="0.75" />
-        <EntityTypeShape EntityType="PruebasCrudMVCModel.Users" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="PruebasCrudMVCModel.Calificacion" Width="1.5" PointX="3" PointY="0.875" />
+        <EntityTypeShape EntityType="PruebasCrudMVCModel.Canciones" Width="1.5" PointX="0.75" PointY="0.875" />
+        <EntityTypeShape EntityType="PruebasCrudMVCModel.Users" Width="1.5" PointX="0.75" PointY="4.875" />
+        <AssociationConnector Association="PruebasCrudMVCModel.FK_Calificacion_Canciones" />
+        <AssociationConnector Association="PruebasCrudMVCModel.FK_Calificacion_Users" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

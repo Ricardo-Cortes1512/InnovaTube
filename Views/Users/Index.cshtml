@@ -12,7 +12,14 @@
     </div>*@
 <br>
 <br>
-<input type="text" id="buscar" placeholder="Buscar por canción o artista..." />
+<div class="row mb-3">
+    <div class="col-md-6">
+        <input type="text" id="buscar" class="form-control" placeholder="Buscar por canción o artista..." />
+    </div>
+    <div class="col-md-6 text-end">
+        @Html.DropDownList("generoFiltro", (SelectList)ViewBag.Generos, "Todos", new { @class = "form-select w-auto d-inline-block", id = "generoFiltro" })
+    </div>
+</div>
 <br>
 <br>
 <div class="row">
@@ -20,10 +27,13 @@
         <table id="tablaCanciones" class="table-bordered">
             <thead>
                 <tr>
-                    <th class="col-md-4">Cancion</th>
-                    <th class="col-md-4">Artista</th>
-                    <th class="col-md-4">Genero</th>
-                    <th class="col-md-4"></th>
+                    <th style="display:none;"></th> <!-- para el ID oculto -->
+                    <th class="col-md-3">Cancion</th>
+                    <th class="col-md-2">Artista</th>
+                    <th class="col-md-2">Genero</th>
+                    <th class="col-md-1">Favorito</th>
+                    <th class="col-md-3">Calificacion</th>
+                    <th class="col-md-2">Promedio</th>
                 </tr>
             </thead>
             <tbody>
@@ -39,6 +49,41 @@
                         <td>
                             <input onclick="jsDelete(@elemento.ID);" type="button" value="Favorito" class="btn btn-primary" />
                         </td>
+                        <td>
+                            <div style="display: flex; flex-direction: column;">
+                                <select class="form-select calificacion" data-id="@elemento.ID">
+                                    @for (int i = 0; i <= 5; i++)
+                                    {
+                                        <option value="@i" @(elemento.CalificaionUsuario == i ? "selected" : "")>
+                                            @(new String('⭐', i))
+                                        </option>
+                                    }
+                                </select>
+
+                                <small class="texto-calificacion mt-1">
+                                    @if (elemento.CalificaionUsuario.HasValue)
+                                    {
+                                        for (int i = 0; i < elemento.CalificaionUsuario; i++)
+                                        {
+                                            <span>⭐</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span>No calificada</span>
+                                    }
+                                </small>
+                            </div>
+                        </td>
+                        <td class="promedio">
+                            <span title="Promedio">@Math.Round(elemento.PromedioCalificacion, 1)</span>
+                            @for (int i = 0; i < Math.Round(elemento.PromedioCalificacion); i++)
+                            {
+                                <span>⭐</span>
+                            }
+                            <br />
+                            <small>(@elemento.TotalCalificaciones calificaciones)</small>
+                        </td>
                     </tr>
                 }
             </tbody>
@@ -46,7 +91,7 @@
     </div>
 </div>
 
-    <script>
+<script>
         function jsDelete(id)
         {
                 url = "@Url.Content("~/Users/Favorito")" + "/"+ id;
@@ -61,7 +106,7 @@
                             }
                 })
         }
-    </script>
+</script>
 
 @section scripts{
 
@@ -108,6 +153,105 @@
             });
         });
     });
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#generoFiltro').on('change', function () {
+                var generoSeleccionado = $(this).val().toLowerCase();
+
+                $('#tablaCanciones tbody tr').each(function () {
+                    var genero = $(this).find('td:eq(3)').text().toLowerCase();
+
+                    if (generoSeleccionado === "" || genero.includes(generoSeleccionado)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+    $(document).on("change", ".calificacion", function () {
+        var cancionId = $(this).data("id");
+        var puntuacion = $(this).val();
+
+        $.ajax({
+            url: '@Url.Action("Calificar", "Users")',
+            method: "POST",
+            data: {
+                cancionId: cancionId,
+                puntuacion: puntuacion
+            },
+            success: function () {
+                alert("¡Gracias por tu calificación!");
+            },
+            error: function () {
+                alert("Ocurrió un error.");
+            }
+        });
+    });
+    </script>
+
+    <script>
+    $(document).ready(function () {
+        $(".calificacion").on("change", function () {
+            const cancionId = $(this).data("id");
+            const puntuacion = $(this).val();
+            const $calificacionTexto = $(this).siblings(".texto-calificacion");
+            const $promedioCelda = $(this).closest("tr").find(".promedio");
+
+            $.ajax({
+                url: '@Url.Action("Calificar", "Users")',
+                method: "POST",
+                data: {
+                    cancionId: cancionId,
+                    puntuacion: puntuacion
+                },
+                success: function (response) {
+                    // Actualizar calificación del usuario
+                    let estrellasUsuario = "";
+                    for (let i = 0; i < puntuacion; i++) {
+                        estrellasUsuario += "⭐";
+                    }
+                    $calificacionTexto.html(estrellasUsuario || "No calificada");
+
+                    // Actualizar promedio
+                    const promedio = parseFloat(response.promedio).toFixed(1);
+                    let estrellasProm = "";
+                    for (let i = 0; i < Math.round(response.promedio); i++) {
+                        estrellasProm += "⭐";
+                    }
+
+                    $promedioCelda.html(`<span title="Promedio">${promedio}</span> ${estrellasProm}`);
+                },
+                error: function () {
+                    alert("Error al actualizar calificación.");
+                }
+            });
+        });
+    });
+    </script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#tablaCanciones').DataTable({
+                paging: false,  // desactiva paginación si no la necesitas
+                info: false,    // quita texto "Mostrando X de Y"
+                searching: false // ya tienes tu propio buscador
+            });
+        });
     </script>
 }
 
